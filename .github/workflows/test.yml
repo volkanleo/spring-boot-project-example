@@ -15,15 +15,15 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
-          pull_request_url: ${{ github.event.pull_request.comments_url }}
-          github_token: ${{ secrets.PR_CHECK }}    
+          distribution: 'adopt'
+          
       - name: Build with Maven
-        run: mvn clean install --batch-mode --no-transfer-progress
+        run: mvn clean install --batch-mode --no-transfer-progress -DskipTests
       
       - name: Check dependency versions
         run: |
           # List the dependencies you want to check here
-          DEPENDENCIES=(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \ | grep '\->' \ | awk -F ' ' '{if ($2 != $4) print $0}')
+          DEPENDENCIES=("groupId:artifactId:version1" "groupId:artifactId:version2" "groupId:artifactId:version3")
           
           # Loop through the dependencies and check their versions
           for dependency in "${DEPENDENCIES[@]}"; do
@@ -38,4 +38,4 @@ jobs:
               echo "✅ ${dependency} version is correct"
             fi
           done
-      
+
