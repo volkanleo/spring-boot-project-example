@@ -3,7 +3,7 @@ A Complete Spring Boot Example Project with Spring Boot 2.6.2, JDK 17 & Maven.
 
 ## Table of Contents
 
-1. [How to Contribute](#how-to-contribute)
+1. [How to Contribute](#how-to-contribute) 
 2. [Requirements](#requirements)
 3. [Running the Application Locally](#running-the-application-locally)
 4. [Run Actuator](#run-actuator)
