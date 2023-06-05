@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * REST Controller for provided customer reference related API end-points.
+ * REST Controller for provided customer reference related API end-points. 
  *
  * @author <a href="https://github.com/volkanozturk">Volkan Ozturk</a>
  * @since 1.0.0
