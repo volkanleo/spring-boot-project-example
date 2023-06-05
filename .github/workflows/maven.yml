@@ -24,12 +24,8 @@ jobs:
           dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
           | awk -F ' ' '{if ($2 != $4) print $0}')
           # Loop through the dependencies and check their versions
-          message=""
-          if [ -z "$dependency_updates" ];
-          then
-            message="✅ Congratulations, all your plugins have the latest releases! 🥳"
-          else
-            dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
-            countOutdated=$(echo "$dependency_updates" | wc -l)
-            message="❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
-          fi      
+          if [[ -n "$dependency_updates" ]]; then
+          echo "WARNING: The following dependencies or microservices have updates available:"
+              echo "$dependency_updates"
+          echo "Please update the dependencies and microservice versions before committing..."
+          fi
