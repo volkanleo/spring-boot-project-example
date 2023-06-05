@@ -30,7 +30,6 @@ jobs:
       run: |
           # List the dependencies you want to check here
           DEPENDENCIES=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
-          | grep '\->' \
           | awk -F ' ' '{if ($2 != $4) print $0}')
           # Loop through the dependencies and check their versions
           for dependency in "${DEPENDENCIES[@]}"; do
