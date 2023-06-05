@@ -1,0 +1,39 @@
+name: Dependency Check
+on:
+  pull_request:
+    types: [opened]
+    
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          
+      - name: Build with Maven
+        run: mvn clean install --batch-mode --no-transfer-progress
+      
+      - name: Check dependency versions
+        run: |
+          # List the dependencies you want to check here
+          DEPENDENCIES=(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \ | grep '\->' \ | awk -F ' ' '{if ($2 != $4) print $0}')
+          
+          # Loop through the dependencies and check their versions
+          for dependency in "${DEPENDENCIES[@]}"; do
+            echo "Checking ${dependency} version..."
+            CURRENT_VERSION=$(mvn dependency:resolve | grep ${dependency} | awk -F: '{print $4}')
+            EXPECTED_VERSION=$(mvn help:evaluate -Dexpression=${dependency} -q -DforceStdout)
+            
+            if [[ "${CURRENT_VERSION}" != "${EXPECTED_VERSION}" ]]; then
+              echo "❌ ${dependency} version mismatch. Expected ${EXPECTED_VERSION}, found ${CURRENT_VERSION}"
+              exit 1
+            else
+              echo "✅ ${dependency} version is correct"
+            fi
+          done
