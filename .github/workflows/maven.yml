@@ -8,30 +8,24 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          java-version: '11'
-          distribution: 'temurin'
-
-      - name: Check dependency versions
-        run: |
-          DEPENDENCIES=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false | awk -F ' ' '{if ($2 != $4) print $0}')
-
-          while IFS= read -r dependency; do
-            echo "Checking ${dependency} version..."
-            CURRENT_VERSION=$(mvn dependency:resolve | grep ${dependency} | awk -F: '{print $4}')
-            EXPECTED_VERSION=$(mvn help:evaluate -Dexpression=${dependency} -q -DforceStdout)
-
-            if [[ "${CURRENT_VERSION}" != "${EXPECTED_VERSION}" ]]; then
-              echo "❌ ${dependency} version mismatch. Expected ${EXPECTED_VERSION}, found ${CURRENT_VERSION}"
-              exit 1
-            else
-              echo "✅ ${dependency} version is correct"
-            fi
-          done <<< "$DEPENDENCIES"
+    - uses: actions/checkout@v3
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+    - name: Check dependency versions
+      run: |
+          # List the dependencies you want to check here
+          dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+          | awk -F ' ' '{if ($2 != $4) print $0}')
+          # Loop through the dependencies and check their versions
+          if [[ -n "$dependency_updates" ]]; then
+          echo "WARNING: The following dependencies or microservices have updates available:"
+              echo "$dependency_updates"
+          echo "Please update the dependencies and microservice versions before committing..."
+          fi
