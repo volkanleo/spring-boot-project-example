@@ -1,41 +1,16 @@
-name: Dependency Check
+name: Check Dependencies
+
 on:
   pull_request:
     types: [opened]
-    
 jobs:
-  dependency-check:
+  dependency_check:
     runs-on: ubuntu-latest
-
+    name: Check dependencies and add a comment in the PR with the result
     steps:
-      - name: Checkout code
+      - name: Checkout project sources
         uses: actions/checkout@v2
-
-      - name: Set up JDK
-        uses: actions/setup-java@v2
+      - name: Check Dependencies
+        uses: volkanleo/check-dependencies-in-pr-action@1.0.1
         with:
-          java-version: '11'
-          distribution: 'adopt'
-          
-      - name: Build with Maven
-        run: mvn clean install --batch-mode --no-transfer-progress -DskipTests
-      
-      - name: Check dependency versions
-        run: |
-          # List the dependencies you want to check here
-          DEPENDENCIES=("groupId:artifactId:version1" "groupId:artifactId:version2" "groupId:artifactId:version3")
-          
-          # Loop through the dependencies and check their versions
-          for dependency in "${DEPENDENCIES[@]}"; do
-            echo "Checking ${dependency} version..."
-            CURRENT_VERSION=$(mvn dependency:resolve | grep ${dependency} | awk -F: '{print $4}')
-            EXPECTED_VERSION=$(mvn help:evaluate -Dexpression=${dependency} -q -DforceStdout)
-            
-            if [[ "${CURRENT_VERSION}" != "${EXPECTED_VERSION}" ]]; then
-              echo "❌ ${dependency} version mismatch. Expected ${EXPECTED_VERSION}, found ${CURRENT_VERSION}"
-              exit 1
-            else
-              echo "✅ ${dependency} version is correct"
-            fi
-          done
-
+          pull_request_url: ${{ github.event.pull_request.comments_url }}
