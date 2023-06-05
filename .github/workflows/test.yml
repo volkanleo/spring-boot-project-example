@@ -15,7 +15,8 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
-          
+          pull_request_url: ${{ github.event.pull_request.comments_url }}
+          github_token: ${{ secrets.PR_CHECK }}    
       - name: Build with Maven
         run: mvn clean install --batch-mode --no-transfer-progress
       
@@ -37,3 +38,4 @@ jobs:
               echo "✅ ${dependency} version is correct"
             fi
           done
+      
