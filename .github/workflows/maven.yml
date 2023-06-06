@@ -8,34 +8,42 @@ jobs:
   dependency_check:
     runs-on: ubuntu-latest
     name: Check dependencies and add a comment in the PR with the result
+
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+
       - name: Check Maven Dependency Updates
         id: build
         run: |
-          dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
-            | awk -F ' -> ' '{if ($2 != $3) print $0}')
+          mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+            | awk -F ' -> ' '{if ($2 != $3) print $0}' \
+            | tee dependency_updates.txt
 
-          if [ -z "$dependency_updates" ]; then
+          if [ ! -s "dependency_updates.txt" ]; then
             message="✅ Congratulations, all your plugins have the latest releases! 🥳"
           else
-            dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
-            countOutdated=$(echo "$dependency_updates" | wc -l)
+            dependency_updates=$(cat dependency_updates.txt | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
+            countOutdated=$(wc -l < dependency_updates.txt)
             message="❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
           fi
-      - name: Post Comment on PR
-        run: echo "${{ steps.build.outputs.message }}"          
+
       - name: Add Comment to PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v4
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const comment = `{
               "body": "${{ steps.build.outputs.message }}"
             }`;
             const request = {
               method: 'POST',
-              url: `${{ github.event.pull_request.comments_url }}`,
+              url: '${{ github.event.pull_request.comments_url }}',
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `token ${{ secrets.PR_CHECK }}`
