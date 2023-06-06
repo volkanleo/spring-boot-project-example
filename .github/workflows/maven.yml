@@ -18,6 +18,7 @@ jobs:
           dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
             | awk -F ' ' '{if ($2 != $4) print $0}')
+          message=""    
       - name: Prepare Message
         id: check_dependencies
         run: |
@@ -44,6 +45,6 @@ jobs:
                 'Content-Type': 'application/json',
                 'Authorization': `token ${{ secrets.PR_CHECK }}`
               },
-              body: message
+              body: message | dependency_updates
             };
             return github.request(request)
