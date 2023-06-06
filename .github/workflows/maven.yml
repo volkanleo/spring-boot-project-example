@@ -23,10 +23,23 @@ jobs:
             countOutdated=$(echo "$dependency_updates" | wc -l)
             message="❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
           fi
+            
+          - name: Post Comment on PR
+                  uses: actions/github-script@v4
+                  with:
+                    github-token: ${{ secrets.PR_CHECK }}
+                    script: |
+                      const comment = `{
+                        "body": "${{ steps.build.outputs.message }}"
+                      }`;
+                      const request = {
+                        method: 'POST',
+                        url: '${{ github.event.pull_request.comments_url }}',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `token ${{ secrets.PR_CHECK }}`
+                        },
+                        body: comment
+                      };
+                      return github.request(request)
 
-          curl \
-            -X POST \
-            "$1" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token ${{ secrets.PR_CHECK }}" \
-            -d "{\"body\": \"$message\"}"
