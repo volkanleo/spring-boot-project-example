@@ -18,18 +18,19 @@ jobs:
           dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | awk '/->/ { if ($2 != $4) print $0 }')
           echo "::set-output name=dependency_updates::$dependency_updates"
-
-      - name: Prepare Message
-        id: prepare_message
-        run: |
-          if [ -z "$dependency_updates" ]; then
-            echo "::set-output name=message::✅ Congratulations, all your plugins have the latest releases! 🥳"
+          dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+              | grep '\->' \
+              | awk -F ' ' '{if ($2 != $4) print $0}')
+          message=""
+          if [ -z "$dependency_updates" ];
+          then
+            message="✅ Congratulations, all your plugins have the latest releases! 🥳"
           else
-            dependency_updates=$(echo "$dependency_updates" | tr '\r\n' '\\n')
+            dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
             countOutdated=$(echo "$dependency_updates" | wc -l)
-            message="You have $countOutdated outdated dependencies:\n\n$dependency_updates"
-            echo "::set-output name=message::$message"
-
+            message="❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
+          fi
+          
       - name: Post Comment on PR
         uses: actions/github-script@v4
         with:
