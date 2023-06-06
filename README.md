@@ -5,7 +5,7 @@ A Complete Spring Boot Example Project with Spring Boot 2.6.2, JDK 17 & Maven.
 
 1. [How to Contribute](#how-to-contribute)
 2. [Requirements](#requirements)
-3. [Running the Application Locally](#running-the-application-locally)
+3. [Running the Application Locally](#running-the-application-locally) 
 4. [Run Actuator](#run-actuator)
 5. [Run Swagger UI Documentation](#run-swagger-ui-documentation)
 6. [Javadoc](#javadoc)
