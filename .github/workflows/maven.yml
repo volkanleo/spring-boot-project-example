@@ -21,23 +21,21 @@ jobs:
           dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
               | grep '\->' \
               | awk -F ' ' '{if ($2 != $4) print $0}')
-          message=""
-          if [ -z "$dependency_updates" ];
-          then
-            message="✅ Congratulations, all your plugins have the latest releases! 🥳"
+          if [ -z "$dependency_updates" ]; then
+            echo "::set-output name=message::✅ Congratulations, all your plugins have the latest releases! 🥳"
           else
             dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
             countOutdated=$(echo "$dependency_updates" | wc -l)
-            message="❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
+            echo "::set-output name=message::❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
           fi
-          
+
       - name: Post Comment on PR
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
             const comment = `{
-              "body": "${{ steps.display_dependencies.message }}"
+              "body": "${{ steps.display_dependencies.outputs.message }}"
             }`;
             const request = {
               method: 'POST',
@@ -49,4 +47,3 @@ jobs:
               body: comment
             };
             return github.request(request)
-            
