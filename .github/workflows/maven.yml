@@ -18,13 +18,13 @@ jobs:
           dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
             | awk -F ' ' '{if ($2 != $4) print $0}')
-          message=""    
+          message=""
+          
       - name: Prepare Message
         id: check_dependencies
         run: |
-          if [ -z "$dependency_updates" ]; 
-          then
-           message=" ✅ Congratulations, all your plugins have the latest releases! 🥳 "
+          if [ -z "$dependency_updates" ]; then
+            message="✅ Congratulations, all your plugins have the latest releases! 🥳"
           else
             dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
             countOutdated=$(echo "$dependency_updates" | wc -l)
@@ -36,7 +36,7 @@ jobs:
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const message = `{
+            const comment = `{
               "body": "${{ steps.check_dependencies.outputs.message }}"
             }`;
             const request = {
@@ -46,6 +46,6 @@ jobs:
                 'Content-Type': 'application/json',
                 'Authorization': `token ${{ secrets.PR_CHECK }}`
               },
-              body: message
+              body: comment
             };
             return github.request(request)
