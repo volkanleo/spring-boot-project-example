@@ -45,7 +45,5 @@ jobs:
             };
             return github.request(request)
 
-          github-token: ${{ secrets.PR_CHECK }}
-
       - name: Post Comment on PR
         run: echo "${{ steps.build.outputs.message }}"
