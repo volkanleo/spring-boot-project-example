@@ -11,6 +11,7 @@ jobs:
       - name: Checkout project sources
         uses: actions/checkout@v2
       - name: Check Maven Dependency Updates
+        id: build
         run: |
           dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
@@ -23,12 +24,11 @@ jobs:
             countOutdated=$(echo "$dependency_updates" | wc -l)
             message="❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
           fi
-            
-          - name: Post Comment on PR
-                  uses: actions/github-script@v4
-                  with:
-                    github-token: ${{ secrets.PR_CHECK }}
-                    script: |
+          
+      - uses: actions/github-script@v6
+        id: set-result
+        with:
+            script: |
                       const comment = `{
                         "body": "${{ steps.build.outputs.message }}"
                       }`;
@@ -42,4 +42,8 @@ jobs:
                         body: comment
                       };
                       return github.request(request)
+
+            github-token: ${{ secrets.PR_CHECK }}
+      - name: Post Comment on PR
+        run: echo "${{ steps.build.outputs.message }}"
 
