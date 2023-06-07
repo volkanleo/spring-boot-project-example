@@ -49,4 +49,4 @@ jobs:
       - name: Post Comment on PR
         run: echo "${{ steps.build.message }}"
       - name: sdfsdfsdf
-        run: echo "${{ message }}"
+        run: echo message
