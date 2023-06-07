@@ -38,6 +38,7 @@ jobs:
           fi
     
           echo $message
+          echo "::set-output name=myOutput::$message"
           
       - uses: actions/github-script@v5
         with:
@@ -47,5 +48,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '${{ steps.dependency_updates.outputs.message }}'
+              body: '${{ needs.dependency_updates.outputs.myOutput }}'
             })
