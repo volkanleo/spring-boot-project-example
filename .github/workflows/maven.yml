@@ -44,15 +44,10 @@ jobs:
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const request = {
-              method: 'POST',
-              url: '${{ github.event.pull_request.comments_url }}',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `token ${{ secrets.PR_CHECK }}`
-              },
-              body: `${
-                process.env.message.replace(/`/g, '\\`')
-              }`
-            };
-            return github.request(request)
+            const { data } = await github.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '${{ steps.check_dependency_updates.outputs.message }}'
+            });
+            console.log(data);
