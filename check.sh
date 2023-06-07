@@ -12,6 +12,6 @@ else
 fi
 
 echo "Release successfully finished."
-echo "::set-output name=message::Release *finished!*"
+echo $message
 
 
