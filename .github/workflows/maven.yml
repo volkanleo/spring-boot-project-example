@@ -44,7 +44,7 @@ jobs:
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const { data } = await github.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+            const { data } = await github.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
