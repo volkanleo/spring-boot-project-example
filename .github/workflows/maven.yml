@@ -28,8 +28,9 @@ jobs:
           fi
 
       - name: Add Comment to PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v4
         with:
+          github-token: ${{ secrets.PR_CHECK }}
           script: |
             const comment = `{
               "body": "${{ steps.build.outputs.message }}"
