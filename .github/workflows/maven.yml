@@ -36,17 +36,16 @@ jobs:
             countOutdated=$(echo "$dependency_updates" | wc -l)
             message="❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
           fi
-    
-          echo $message
-          echo "::set-output name=myOutput::$message"
           
-      - uses: actions/github-script@v5
-        with:
-          github-token: ${{secrets.PR_CHECK}}
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '${{ needs.dependency_updates.outputs.myOutput }}'
-            })
+          echo $message
+          
+          curl \
+            -X POST \
+            $URL \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token $PR_CHECK" \
+            --data '{ "body": "blah blah" }'
+            
+          echo $message
+
+
