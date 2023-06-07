@@ -40,12 +40,10 @@ jobs:
           echo $message
           
           run: |
-          echo "{\"body\": \"$message\"}" > comment.json
           curl -X POST "${{ github.event.pull_request.comments_url }}" \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.PR_CHECK }}" \
-            -d @comment.json
-
+            --data-raw "{\"body\": \"$message\"}"
 
             
           
