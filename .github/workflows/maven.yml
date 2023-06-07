@@ -44,9 +44,6 @@ jobs:
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const comment = `{
-              "body": "${{ steps.check_dependencies.outputs.message }}"
-            }`;
             const request = {
               method: 'POST',
               url: '${{ github.event.pull_request.comments_url }}',
@@ -54,6 +51,8 @@ jobs:
                 'Content-Type': 'application/json',
                 'Authorization': `token ${{ secrets.PR_CHECK }}`
               },
-              body: comment
+               {
+                  \"body\": \"$message\"
+              }
             };
             return github.request(request)
