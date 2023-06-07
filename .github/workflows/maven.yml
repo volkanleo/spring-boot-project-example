@@ -36,13 +36,15 @@ jobs:
             countOutdated=$(echo "$dependency_updates" | wc -l)
             message="❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
           fi
-      
+    
+          echo "Release successfully finished."
+          echo $message
+          
       - name: Add PR Comment
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const message = `Release successfully finished.\n\n${{ steps.dependency_updates.outputs.message }}`;
             const { owner, repo } = context.repo;
             const { number } = context.payload.pull_request;
-            await github.issues.createComment({ owner, repo, issue_number: number, body: message });
+            await github.issues.createComment({ owner, repo, issue_number: number, body: $message });
