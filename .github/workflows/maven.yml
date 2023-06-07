@@ -40,11 +40,14 @@ jobs:
           echo "Release successfully finished."
           echo $message
           
-      - name: Add PR Comment
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.PR_CHECK }}
-          script: |
-            const { owner, repo } = context.repo;
-            const { number } = context.payload.pull_request;
-            await github.issues.createComment({ owner, repo, issue_number: number, body: '${{ steps.dependency_updates.outputs.message }}' });
+          - name: Add comment to PR
+            env:
+              URL: ${{ github.event.issue.comments_url }}
+              GITHUB_TOKEN: ${{ secrets.PR_CHECK }}
+            run: |
+              curl \
+                -X POST \
+                $URL \
+                -H "Content-Type: application/json" \
+                -H "Authorization: token $GITHUB_TOKEN" \
+                --data '{ "body": \"$message\" }'
