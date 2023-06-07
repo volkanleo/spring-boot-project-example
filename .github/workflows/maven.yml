@@ -47,4 +47,6 @@ jobs:
             return github.request(request)
 
       - name: Post Comment on PR
-        run: echo "${{ steps.build.outputs.message }}"
+        run: echo "${{ steps.build.message }}"
+      - name: sdfsdfsdf
+        run: echo "${{ message }}"
