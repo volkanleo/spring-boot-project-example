@@ -43,8 +43,12 @@ jobs:
           curl -X POST "${{ github.event.pull_request.comments_url }}" \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.PR_CHECK }}" \
-            --data-raw "{\"body\": \"$message\"}"
-
+            -d \
+            "
+            {
+                  \"body\": \"$message\"
+            }
+            "
             
           
 
