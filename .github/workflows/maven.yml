@@ -17,9 +17,11 @@ jobs:
         id: build
         run: |
           dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
-            | awk -F ' -> ' '{if ($2 != $3) print $0}')
-
-          if [ -z "$dependency_updates" ]; then
+              | grep '\->' \
+              | awk -F ' ' '{if ($2 != $4) print $0}')
+          message=""
+          if [ -z "$dependency_updates" ];
+          then
             message="✅ Congratulations, all your plugins have the latest releases! 🥳"
           else
             dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
@@ -33,7 +35,7 @@ jobs:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
             const comment = `{
-              "body": "${{ steps.build.outputs.message }}"
+              "body": "${{ steps.build.outputs.dependency_updates }}"
             }`;
             const request = {
               method: 'POST',
@@ -47,6 +49,6 @@ jobs:
             return github.request(request)
 
       - name: Post Comment on PR
-        run: echo "${{ steps.build.message }}"
+        run: echo "${{ steps.build.dependency_updates }}"
       - name: sdfsdfsdf
-        run: echo "${{ message }}"
+        run: echo "${{ dependency_updates }}"
