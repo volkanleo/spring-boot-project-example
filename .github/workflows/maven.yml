@@ -39,13 +39,15 @@ jobs:
           
           echo $message
           
-          curl \
-            -X POST \
-            $URL \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token $PR_CHECK" \
-            --data '{ "body": "blah blah" }'
+          run: |
+            curl \
+              -X POST \
+              $URL \
+              -H "Content-Type: application/json" \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              --data '{ "body": "blah blah" }'  
+
             
-          echo $message
+          
 
 
