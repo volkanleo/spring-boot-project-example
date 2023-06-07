@@ -47,4 +47,4 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const { number } = context.payload.pull_request;
-            await github.issues.createComment({ owner, repo, issue_number: number, body: $message });
+            await github.issues.createComment({ owner, repo, issue_number: number, body: '${{ steps.dependency_updates.outputs.message }}' });
