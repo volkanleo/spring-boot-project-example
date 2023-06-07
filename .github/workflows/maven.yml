@@ -51,6 +51,6 @@ jobs:
                 'Content-Type': 'application/json',
                 'Authorization': `token ${{ secrets.PR_CHECK }}`
               },
-              \"body\": \"$message\"
+              body: `${{ toJSON(message) }}`
             };
             return github.request(request)
