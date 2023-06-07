@@ -37,17 +37,4 @@ jobs:
             message="❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
           fi
     
-          echo "Release successfully finished."
           echo $message
-          
-          - name: Add comment to PR
-            env:
-              URL: ${{ github.event.issue.comments_url }}
-              GITHUB_TOKEN: ${{ secrets.PR_CHECK }}
-            run: |
-              curl \
-                -X POST \
-                $URL \
-                -H "Content-Type: application/json" \
-                -H "Authorization: token $GITHUB_TOKEN" \
-                --data '{ "body": \"$message\" }'
