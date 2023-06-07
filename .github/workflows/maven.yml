@@ -50,5 +50,3 @@ jobs:
 
       - name: Post Comment on PR
         run: echo "${{ steps.build.dependency_updates }}"
-      - name: sdfsdfsdf
-        run: echo "${{ dependency_updates }}"
