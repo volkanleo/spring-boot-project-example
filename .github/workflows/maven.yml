@@ -15,6 +15,7 @@ jobs:
 
       - name: Check Maven Dependency Updates
         id: build
+      - shell: bash
         run: |
           dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
               | grep '\->' \
@@ -49,4 +50,4 @@ jobs:
             return github.request(request)
 
       - name: Post Comment on PR
-        run: echo "${{ steps.build.dependency_updates }}"
+        run: echo "${{ steps.build.message }}"
