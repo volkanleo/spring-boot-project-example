@@ -40,12 +40,7 @@ jobs:
           echo $message
           
           run: |
-            curl \
-              -X POST \
-              $URL \
-              -H "Content-Type: application/json" \
-              -H "Authorization: token $GITHUB_TOKEN" \
-              --data '{ "body": "blah blah" }'  
+            curl -X POST -H "Content-Type: application/json" "Authorization: token $PR_CHECK" -d "{\"text\": \"$message\"}" "$github.event.pull_request.comments_url"
 
             
           
