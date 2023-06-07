@@ -11,14 +11,7 @@ else
   message="❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
 fi
 
-curl \
-  -X POST \
-  "$1" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: token $2" \
-  -d \
-  "
-  {
-        \"body\": \"$message\"
-  }
-  "
+echo "Release successfully finished."
+echo "::set-output name=message::Release *finished!*"
+
+
