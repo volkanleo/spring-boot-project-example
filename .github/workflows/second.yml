@@ -4,7 +4,6 @@ on:
   pull_request:
     types:
       - opened
-      - synchronize
 
 jobs:
   check-dependencies:
@@ -32,7 +31,7 @@ jobs:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
             const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
-            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available::\n\n${updates}`;
+            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
             const { owner, repo, number } = context.issue;
             github.pulls.createReview({
               owner: owner,
