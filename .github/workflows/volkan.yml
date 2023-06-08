@@ -1,0 +1,36 @@
+name: Maven Dependency Check
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+
+      - name: Build with Maven
+        run: mvn clean install --batch-mode --no-transfer-progress
+
+      - name: Check Maven Dependencies
+        id: check-dependencies
+        run: |
+          dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+            | grep '\->' \
+            | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt)
+          has_updates=$(cat dependency-updates.txt | grep -c "\->")
+          echo "::set-output name=has-updates::${has_updates}"
+          echo "::set-output name=dependency-updates::${dependency_updates}"
+
+      - name: Comment on PR
+        if: ${{ steps.check-dependencies.outputs.has-updates == '1' }}
+        run: |
+          comment="**Maven Dependencies Update**\n\nThe following dependencies have newer versions available:\n\n$(cat dependency-updates.txt)"
+          echo "$comment" | gh pr review "${{ github.event.pull_request.number }}" --comment
