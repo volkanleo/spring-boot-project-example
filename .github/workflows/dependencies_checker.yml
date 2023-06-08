@@ -16,17 +16,18 @@ jobs:
         
       - name: Check for dependency updates
         run: |
-           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+          dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
-            | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
-
-      - name: Extract dependency updates
-        id: extract-updates
-        run: |
+            | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt)
+          has_updates=$(cat dependency-updates.txt | grep -c "\->")
+          echo "::set-output name=has-updates::${has_updates}"
+          echo "::set-output name=dependency-updates::${dependency_updates}"
           echo "::set-output name=updates::$(grep -c " -> " dependency-updates.txt)"
 
+          
+
       - name: Comment on pull request (if updates found)
-        if: ${{ steps.extract-updates.outputs.updates != '' && steps.extract-updates.outputs.updates != '0' }}
+        if: ${{ steps.check-dependencies.outputs.has-updates == '1'  }}
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
