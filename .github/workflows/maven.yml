@@ -45,7 +45,7 @@ jobs:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
             const message = `{
-              "body": "${{ steps.dependency_updates.outputs.message }}"
+              "body": "${{ message }}"
             }`;
             const request = {
               method: 'POST',
