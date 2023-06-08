@@ -1,50 +1,43 @@
-name: Maven Dependency Updates 2
+name: Dependency Check
 
 on:
   pull_request:
-    types: [opened]
+    types:
+      - opened
+      - synchronize
 
 jobs:
-  check-dependency-updates:
+  check-dependencies:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-    
-      - name: Check Dependency Updates
-        id: dependency_updates
+        
+      - name: Check for dependency updates
         run: |
-          dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
-            | awk -F ' ' '{if ($2 != $4) print $0}')
+            | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
 
-          if [ -z "$dependency_updates" ]; then
-            echo "::set-output name=message::✅ Congratulations, all your dependency have the latest releases! 🥳"
-          else
+      - name: Extract dependency updates
+        id: extract-updates
+        run: |
+          echo "::set-output name=updates::$(grep -c " -> " dependency-updates.txt)"
 
-            dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
-            echo "::set-output name=message::❌ **The following dependencies or microservices have updates available:** $dependency_updates"
-            echo $dependency_updates
-          fi
-
-      - name: Post Comment on PR
+      - name: Comment on pull request (if updates found)
+        if: ${{ steps.extract-updates.outputs.updates > 0 }}
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const message = {
-              body: "${{ steps.dependency_updates.outputs.message }}"
-            };
-
-            const request = {
-              method: 'POST',
-              url: "${{ github.event.pull_request.comments_url }}",
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'token ${{ secrets.PR_CHECK }}'
-              },
-              body: JSON.stringify(message)
-            };
-
-            await github.request(request);
+            const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
+            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available::\n\n${updates}`;
+            const { owner, repo, number } = context.issue;
+            github.pulls.createReview({
+              owner: owner,
+              repo: repo,
+              pull_number: number,
+              body: commentBody
+            });
+          
