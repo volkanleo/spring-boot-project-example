@@ -43,7 +43,7 @@ jobs:
                 'Content-Type': 'application/json',
                 'Authorization': 'token ${{ secrets.PR_CHECK }}'
               },
-              JSON.stringify(message)
+              body: JSON.stringify(message)
             };
 
             await github.request(request);
