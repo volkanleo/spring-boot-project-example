@@ -42,7 +42,7 @@ jobs:
           run: |
           curl -X POST "${{ github.event.pull_request.comments_url }}" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.PR_CHECK }}" \
+            -H "Authorization: token ${{ secrets.PR_CHECK }}" \
             -d "{\"body\": \"$message\"}"
             
                   
