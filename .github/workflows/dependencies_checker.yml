@@ -29,10 +29,9 @@ jobs:
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const fs = require('fs');
-            const updates = parseInt(fs.readFileSync('dependency-updates.txt', 'utf8').trim());
+            const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
             const { owner, repo, number } = context.issue;
-            const commentBody = updates > 0
+            const commentBody = ${{ fromJSON(steps.extract-updates.outputs.updates).length > 0}}
               ? `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`
               : '✅ Congratulations, all your dependencies have the latest releases! 🥳';
             github.pulls.createReview({
