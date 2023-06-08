@@ -22,7 +22,8 @@ jobs:
           if [ -z "$dependency_updates" ]; then
             echo "::set-output name=message::✅ Congratulations, all your dependency have the latest releases! 🥳"
           else
-            dependency_updates=$(echo "$dependency_updates" | awk '{printf "%s\\n", $0}')
+            
+            dependency_updates=$(echo "$dependency_updates" | tr '\n' '\\n')
             echo "::set-output name=message::❌ **The following dependencies or microservices have updates available:** $dependency_updates"
             
           fi
