@@ -15,42 +15,28 @@ jobs:
         
       - name: Check for dependency updates
         run: |
-           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+          mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
             | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
 
       - name: Extract dependency updates
         id: extract-updates
         run: |
-          echo "::set-output name=updates::$(grep -c " -> " dependency-updates.txt)"
+          echo "::set-output name=updates::$(grep -c ' -> ' dependency-updates.txt)"
 
-      - name: Comment on pull request (if updates found)
-        if: ${{ fromJSON(steps.extract-updates.outputs.updates).length > 0 }}
+      - name: Comment on pull request
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
             const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
-            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
             const { owner, repo, number } = context.issue;
+            const commentBody = (updates.length > 0)
+              ? `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`
+              : '✅ Congratulations, all your dependencies have the latest releases! 🥳';
             github.pulls.createReview({
-              owner: owner,
-              repo: repo,
-              pull_number: number,
-              body: commentBody
-            });
-
-      - name: Comment on pull request (if no updates found)
-        if: ${{ fromJSON(steps.extract-updates.outputs.updates).length == 0 }}
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.PR_CHECK }}
-          script: |
-            const commentBody = `✅ Congratulations, all your dependency have the latest releases! 🥳`;
-            const { owner, repo, number } = context.issue;
-            github.pulls.createReview({
-              owner: owner,
-              repo: repo,
+              owner,
+              repo,
               pull_number: number,
               body: commentBody
             });
