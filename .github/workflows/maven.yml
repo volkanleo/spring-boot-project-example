@@ -23,9 +23,9 @@ jobs:
             echo "::set-output name=message::✅ Congratulations, all your dependency have the latest releases! 🥳"
           else
 
-            dependency_updates=$(echo "$dependency_updates" | sed -e 's/$/\\n/')
+            dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
             echo "::set-output name=message::❌ **The following dependencies or microservices have updates available:** $dependency_updates"
-            
+            echo $dependency_updates
           fi
 
       - name: Post Comment on PR
