@@ -1,0 +1,48 @@
+name: Dependency Check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  check-dependencies:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+
+      - name: Build with Maven
+        run: mvn clean install --batch-mode
+
+      - name: Check for dependency updates
+        run: mvn versions:display-dependency-updates -Dversions.outputFile=dependency-updates.txt
+
+      - name: Extract dependency updates
+        id: extract-updates
+        run: |
+          echo "::set-output name=updates::$(grep -c " -> " dependency-updates.txt)"
+
+      - name: Comment on pull request (if updates found)
+        if: ${{ steps.extract-updates.outputs.updates > 0 }}
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.PR_CHECK }}
+          script: |
+            const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
+            const commentBody = `The following dependencies have newer versions available:\n\n${updates}`;
+            const { owner, repo, number } = context.issue;
+            const octokit = github.getOctokit(process.env.PR_CHECK);
+            octokit.issues.createComment({
+              owner,
+              repo,
+              issue_number: number,
+              body: commentBody
+            });
