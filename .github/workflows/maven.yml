@@ -52,7 +52,7 @@ jobs:
               method: 'POST',
               url: "${{ github.event.pull_request.comments_url }}",
               headers: {
-                'Content-Type': 'application/vnd.github.raw+json',
+                'Content-Type': 'application/vnd.github.-preview+json',
                 'Authorization': 'token ${{ secrets.PR_CHECK }}'
               },
               body: message
