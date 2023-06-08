@@ -24,7 +24,7 @@ jobs:
         id: extract
         run: |
           has_updates=$(grep -c "\->" dependency-updates.txt)
-          echo "::set-output name=has_updates::${has_updates}"
+          echo "::set-output name=has_updates::$has_updates"
           echo "has_updates: $has_updates"
           
       - name: Comment on pull request (if updates found)
