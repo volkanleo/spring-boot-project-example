@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        
+
       - name: Check for dependency updates
         run: |
           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
@@ -29,9 +29,10 @@ jobs:
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
+            const fs = require('fs');
+            const updates = parseInt(fs.readFileSync('dependency-updates.txt', 'utf8').trim());
             const { owner, repo, number } = context.issue;
-            const commentBody = updates !== '0'
+            const commentBody = updates > 0
               ? `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`
               : '✅ Congratulations, all your dependencies have the latest releases! 🥳';
             github.pulls.createReview({
