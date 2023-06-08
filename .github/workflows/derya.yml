@@ -40,10 +40,10 @@ jobs:
             const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
             const commentBody = `The following dependencies have newer versions available:\n\n${updates}`;
             const { owner, repo, number } = context.issue;
-            const octokit = github.getOctokit(process.env.PR_CHECK);
-            octokit.issues.createComment({
-              owner,
-              repo,
-              issue_number: number,
+            github.pulls.createReview({
+              owner: owner,
+              repo: crepo,
+              pull_number: number,
               body: commentBody
             });
+          
