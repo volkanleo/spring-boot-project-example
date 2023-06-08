@@ -18,7 +18,7 @@ jobs:
         run: |
            mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
-            | awk -F ' ' '{if ($2 != $4) print $0}' > output.txt
+            | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
 
       - name: Extract dependency updates
         id: extract-updates
