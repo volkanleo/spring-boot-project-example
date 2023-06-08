@@ -28,11 +28,11 @@ jobs:
 
             echo $dependency_updates
           fi
-          
+            
+
       - name: Set dependency updates
         id: volkan
         run: echo "::set-output name=dependency_updates::$(dependency_updates)"
-
 
       - name: Comment on PR with JSON
         uses: actions/github-script@v4
@@ -48,4 +48,5 @@ jobs:
               pull_number: context.payload.pull_request.number,
               body: body
             });
+
   
