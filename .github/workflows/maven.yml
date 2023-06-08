@@ -12,7 +12,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Run shell script
-        run: ./check.sh
+        run: |
+          chmod +x ./check.sh
+        shell: bash  
       
       - name: Set up Java
         uses: actions/setup-java@v2
