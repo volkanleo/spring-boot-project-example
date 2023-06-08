@@ -25,14 +25,13 @@ jobs:
           echo "::set-output name=updates::$(grep -c " -> " dependency-updates.txt)"
 
       - name: Comment on pull request (if updates found)
+        if: ${{ fromJSON(steps.extract-updates.outputs.updates).length > 0}}
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
             const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
-            const commentBody = ${{ fromJSON(steps.extract-updates.outputs.updates).length > 0}}
-              ? `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`
-              : '✅ Congratulations, all your dependencies have the latest releases! 🥳';    
+            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
             const { owner, repo, number } = context.issue;
             github.pulls.createReview({
               owner: owner,
