@@ -33,14 +33,12 @@ jobs:
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const fs = require('fs');
-            const updates = fs.readFileSync('dependency-updates.txt', 'utf8');
-            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
-            const { owner, repo, number, sha } = context.payload.pull_request.head;
+            const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
+            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available::\n\n${updates}`;
+            const { owner, repo, number } = context.issue;
             github.pulls.createReview({
-              owner,
-              repo,
+              owner: owner,
+              repo: repo,
               pull_number: number,
-              body: commentBody,
-              commit_id: sha
+              body: commentBody
             });
