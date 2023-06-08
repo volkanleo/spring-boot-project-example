@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent> 
     <groupId>volkanozturk.examples</groupId>
-    <artifactId>spring-boot-project-example</artifactId>
+    <artifactId>spring-boot-project-example</artifactId> 
     <version>1.0.0</version> 
     <name>spring-boot-project-example</name>
     <description>Spring Boot Project Example by Volkan Ozturk</description>
