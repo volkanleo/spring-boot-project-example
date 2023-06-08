@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
-          distribution: 'temurin'
+          distribution: 'adopt'
       
       - name: Install Maven
         run: sudo apt-get install -y maven
@@ -32,16 +32,11 @@ jobs:
           if [ -z "$dependency_updates" ]; then
             echo "::set-output name=message::✅ Congratulations, all your dependency have the latest releases! 🥳"
           else
-            dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
-            countOutdated=$(echo "$dependency_updates" | wc -l)
-            echo "::set-output name=message::❌ **The following dependencies or microservices have updates available:**\n$dependency_updates"
+            dependency_updates=$(echo "$dependency_updates" | awk '{printf "%s\\n", $0}')
+            echo "::set-output name=message::$dependency_updates"
+            echo "HI THERE :"
             echo $dependency_updates
-            echo "HI THERE"
-            echo $message
-            EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-            echo "JSON_RESPONSE<<$EOF" >> "$GITHUB_ENV"
-            echo "HI THERE 2"
-            echo "$EOF" >> "$GITHUB_ENV"
+            
           fi
           
           curl \
@@ -50,7 +45,7 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.PR_CHECK }}"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "${{ github.event.pull_request.comments_url }}" \
-            -d "{\"body\":\"$dependency_updates\"}"
+            -d "{\"body\": JSON.stringify($dependency_updates) }"
       
 
 
