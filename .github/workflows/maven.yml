@@ -30,7 +30,9 @@ jobs:
           fi
           
       - name: Set dependency updates
-        run: echo "::set-output name=dependency_updates::$dependency_updates"
+        id: volkan
+        run: echo "::set-output name=dependency_updates::$(dependency_updates)"
+
 
       - name: Comment on PR with JSON
         uses: actions/github-script@v4
@@ -38,7 +40,7 @@ jobs:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
             const body = JSON.stringify({
-              message: process.env.dependency_updates
+              message: ${{ steps.volkan.outputs.dependency_updates }}
             });
             github.pulls.createReview({
               owner: context.repo.owner,
