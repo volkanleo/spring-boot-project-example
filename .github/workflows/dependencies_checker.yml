@@ -31,7 +31,7 @@ jobs:
           script: |
             const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
             const { owner, repo, number } = context.issue;
-            const commentBody = (updates.trim() !== '')
+            const commentBody = (updates.trim().length !== 0)
               ? `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`
               : '✅ Congratulations, all your dependencies have the latest releases! 🥳';
             github.pulls.createReview({
