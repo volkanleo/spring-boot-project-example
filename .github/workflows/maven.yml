@@ -11,17 +11,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      
-      - name: Set up Java
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'
-          distribution: 'adopt'
-      
-      - name: Install Maven
-        run: sudo apt-get install -y maven
-      
-
+    
       - name: Check Dependency Updates
         id: dependency_updates
         run: |
