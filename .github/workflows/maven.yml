@@ -39,11 +39,7 @@ jobs:
           
           echo $message
           
-          run: |
-          curl -X POST "${{ github.event.pull_request.comments_url }}" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token ${{ secrets.PR_CHECK }}" \
-            -d "{\"body\": \"$message\"}"
+
             
           - uses: actions/github-script@v6
             with:
@@ -56,7 +52,7 @@ jobs:
                   })).data[0].number,
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  body: '👋 Thanks for reporting!'
+                  body: '$message'
                 })            
 
 
