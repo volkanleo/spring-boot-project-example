@@ -34,8 +34,7 @@ jobs:
           else
             dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
             countOutdated=$(echo "$dependency_updates" | wc -l)
-            echo "::set-output name=message::{\"result\":\"You have $countOutdated plugins with newer available releases:\", \"dependencyUpdates\":\"$dependency_updates\", \"countOutdated\": $countOutdated}"
-
+            echo "::set-output name=message::{'result': 'You have $countOutdated plugins with newer available releases:', 'dependencyUpdates': '$dependency_updates', 'countOutdated': $countOutdated}"
 
           fi
 
