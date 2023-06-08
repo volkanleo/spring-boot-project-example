@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v2
         
       - name: Check for dependency updates
+        id: extract-updates
         run: |
           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
@@ -24,7 +25,7 @@ jobs:
           echo "has_updates: $has_updates"
           
       - name: Comment on pull request (if updates found)
-        if: steps.check-dependencies.outputs.dependency-updates == '1'
+        if: ${{ steps.extract-updates.outputs.has_updates > 0 }}
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
