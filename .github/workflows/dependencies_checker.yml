@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         
       - name: Check for dependency updates
         run: |
@@ -25,12 +25,13 @@ jobs:
           echo "::set-output name=updates::$(grep -c " -> " dependency-updates.txt)"
 
       - name: Comment on pull request (if updates found)
-        if: ${{ fromJSON(steps.extract-updates.outputs.updates).length > 0 }}
-        uses: actions/github-script@v4
+        if: ${{ steps.extract-updates.outputs.updates > 0 }}
+        uses: actions/github-script@v5
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
+            const fs = require('fs');
+            const updates = fs.readFileSync('dependency-updates.txt', 'utf8');
             const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
             const { owner, repo, number } = context.issue;
             github.pulls.createReview({
@@ -42,11 +43,11 @@ jobs:
 
       - name: Comment on pull request (if no updates found)
         if: ${{ fromJSON(steps.extract-updates.outputs.updates).length == 0 }}
-        uses: actions/github-script@v4
+        uses: actions/github-script@v5
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const commentBody = `✅ Congratulations, all your dependency have the latest releases! 🥳`;
+            const commentBody = `✅ Congratulations, all your dependencies have the latest releases! 🥳`;
             const { owner, repo, number } = context.issue;
             github.pulls.createReview({
               owner: owner,
@@ -54,3 +55,4 @@ jobs:
               pull_number: number,
               body: commentBody
             });
+
