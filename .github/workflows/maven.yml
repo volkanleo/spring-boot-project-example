@@ -37,12 +37,12 @@ jobs:
             const commentBody = `PR Dependency Updates:\n\n${{ steps.get-comment-body.outputs.comment-body }}`;
             const pullRequest = context.payload.pull_request;
             const { owner, repo } = context.repo;
-            const octokit = github.getOctokit(process.env.PR_CHECK);
+            const octokit = context.github;
             await octokit.issues.createComment({
               owner,
               repo,
               issue_number: pullRequest.number,
               body: commentBody
-            });          
+            });
 
   
