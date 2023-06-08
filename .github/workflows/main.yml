@@ -18,10 +18,11 @@ jobs:
         run: |
           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
-            | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
+            | awk -F ' ' '$2 != $4 { print $0 }' > dependency-updates.txt
           has_updates=$(grep -c "\->" dependency-updates.txt)
           echo "::set-output name=dependency-updates::${has_updates}"
-
+          echo "has_updates: $has_updates"
+          
       - name: Comment on pull request (if updates found)
         if: steps.check-dependencies.outputs.dependency-updates == '1'
         uses: actions/github-script@v4
@@ -31,10 +32,11 @@ jobs:
             const fs = require('fs');
             const updates = fs.readFileSync('dependency-updates.txt', 'utf8');
             const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
-            const { owner, repo, number } = context.issue;
+            const { owner, repo, number, sha } = context.payload.pull_request.head;
             github.pulls.createReview({
               owner,
               repo,
               pull_number: number,
-              body: commentBody
+              body: commentBody,
+              commit_id: sha
             });
