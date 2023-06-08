@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        
+      
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
@@ -34,11 +34,9 @@ jobs:
           else
             dependency_updates=$(echo "$dependency_updates" | awk '{printf "%s\\n", $0}')
             echo "::set-output name=message::$dependency_updates"
-            echo "HI THERE :"
-            echo $dependency_updates
             
           fi
-          
+
       - name: Post Comment on PR
         uses: actions/github-script@v4
         with:
@@ -52,13 +50,10 @@ jobs:
               method: 'POST',
               url: "${{ github.event.pull_request.comments_url }}",
               headers: {
-                'Content-Type': 'application/vnd.github.-preview+json',
+                'Content-Type': 'application/json',
                 'Authorization': 'token ${{ secrets.PR_CHECK }}'
               },
-              body: message
+              body: JSON.stringify(message)
             };
 
             await github.request(request);
-
-
-
