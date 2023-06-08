@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Run shell script
+        run: ./check.sh
       
       - name: Set up Java
         uses: actions/setup-java@v2
@@ -45,7 +47,7 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.PR_CHECK }}"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "${{ github.event.pull_request.comments_url }}" \
-            -d "{\"body\": JSON.stringify($dependency_updates) }"
+            -d "{\"body\": $dependency_updates }"
       
 
 
