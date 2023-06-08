@@ -28,7 +28,7 @@ jobs:
           echo "has_updates: $has_updates"
           
       - name: Comment on pull request (if updates found)
-        if: steps.extract.outputs.has_updates != '0'
+        if: 1 == 1
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
