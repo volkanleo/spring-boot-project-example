@@ -38,7 +38,7 @@ jobs:
             echo $dependency_updates
             echo "HI THERE"
             echo $message
-            echo '${{ fromJson(dependency_updates) }}'
+            echo  ${{ fromJSON($dependency_updates) }}
             echo "HI dependency_updates"
             echo $dependency_updates
             EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
