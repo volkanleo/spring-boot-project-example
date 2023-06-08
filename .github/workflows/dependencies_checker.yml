@@ -38,20 +38,4 @@ jobs:
               repo: repo,
               pull_number: number,
               body: commentBody
-            });    
-            
-      - name: Comment on pull request (if updates not found)
-        if: ${{ steps.extract-updates.outputs.updates < 1 }}
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.PR_CHECK }}
-          script: |
-            const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
-            const commentBody = `✅ Congratulations, all your dependency have the latest releases! 🥳 `;
-            const { owner, repo, number } = context.issue;
-            github.pulls.createReview({
-              owner: owner,
-              repo: repo,
-              pull_number: number,
-              body: commentBody
             });
