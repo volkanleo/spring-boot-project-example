@@ -42,7 +42,7 @@ jobs:
             const { owner, repo, number } = context.issue;
             github.pulls.createReview({
               owner: owner,
-              repo: crepo,
+              repo: repo,
               pull_number: number,
               body: commentBody
             });
