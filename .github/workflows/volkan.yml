@@ -23,6 +23,8 @@ jobs:
 
       - name: Comment on PR
         if: ${{ steps.check-dependencies.outputs.has-updates == '1' }}
+        env:
+          GH_TOKEN: ${{ secrets.PR_CHECK }}
         run: |
           comment="**Maven Dependencies Update**\n\nThe following dependencies have newer versions available:\n\n$(cat dependency-updates.txt)"
           echo "$comment" | gh pr review "${{ github.event.pull_request.number }}" --comment
