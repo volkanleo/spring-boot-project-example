@@ -20,12 +20,10 @@ jobs:
             | grep '\->' \
             | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
           has_updates=$(grep -c "\->" dependency-updates.txt)
-          echo "::set-output name=has-updates::$has_updates"
-          echo "::set-output name=dependency-updates::$(cat dependency-updates.txt)"
-          echo "::set-output name=updates::$(grep -c " -> " dependency-updates.txt)"
+          echo "::set-output name=dependency-updates::${has_updates}"
 
       - name: Comment on pull request (if updates found)
-        if: steps.check-dependencies.outputs.has-updates == '1'
+        if: steps.check-dependencies.outputs.dependency-updates == '1'
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
