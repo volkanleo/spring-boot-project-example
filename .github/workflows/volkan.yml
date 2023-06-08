@@ -11,14 +11,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'
-
-      - name: Build with Maven
-        run: mvn clean install --batch-mode --no-transfer-progress
-
       - name: Check Maven Dependencies
         id: check-dependencies
         run: |
