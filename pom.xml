@@ -21,7 +21,7 @@
         <dependency.springdoc.openapi.version>1.6.4</dependency.springdoc.openapi.version>
         <dependency.maven.javadoc.plugin>3.0.0</dependency.maven.javadoc.plugin>
     </properties>
-    <dependencies>
+    <dependencies> 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
