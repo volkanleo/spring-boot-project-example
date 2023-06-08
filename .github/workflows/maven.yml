@@ -39,24 +39,25 @@ jobs:
           
           echo $message
           
-          - name: Post Comment on PR
-            uses: actions/github-script@v4
-            with:
-              github-token: ${{ secrets.PR_CHECK }}
-              script: |
-                const message = `{
-                  "body": "${{ steps.check_dependencies.outputs.message }}"
-                }`;
-                const request = {
-                  method: 'POST',
-                  url: '${{ github.event.pull_request.comments_url }}',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'token ${{ secrets.PR_CHECK }}'
-                  },
-                  body: message
-                };
-                return github.request(request)
+      - name: Post Comment on PR
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.PR_CHECK }}
+          script: |
+            const message = `{
+              "body": "${{ steps.check_dependencies.outputs.message }}"
+            }`;
+            const request = {
+              method: 'POST',
+              url: '${{ github.event.pull_request.comments_url }}',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'token ${{ secrets.PR_CHECK }}'
+              },
+              body: message
+            };
+            return github.request(request)
+
 
 
 
