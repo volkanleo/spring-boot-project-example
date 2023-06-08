@@ -23,6 +23,7 @@ jobs:
         id: extract-updates
         run: |
           echo "::set-output name=updates::$(grep -c ' -> ' dependency-updates.txt)"
+          echo $updates
 
       - name: Comment on pull request
         if: ${{ steps.extract-updates.outputs.updates == '0' }}
