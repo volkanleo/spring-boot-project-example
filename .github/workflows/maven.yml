@@ -24,12 +24,25 @@ jobs:
           else
 
             dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
-            echo "::set-output name=message::❌ **The following dependencies or microservices have updates available:** $dependency_updates"
+            echo "::set-output name=comment-body::$dependency_updates"
+
             echo $dependency_updates
           fi
+          
+      - name: Post PR Comment
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.PR_CHECK }}
+          script: |
+            const commentBody = `PR Dependency Updates:\n\n${{ steps.get-comment-body.outputs.comment-body }}`;
+            const pullRequest = context.payload.pull_request;
+            const { owner, repo } = context.repo;
+            const octokit = github.getOctokit(process.env.PR_CHECK);
+            await octokit.issues.createComment({
+              owner,
+              repo,
+              issue_number: pullRequest.number,
+              body: commentBody
+            });          
 
-      - name: Create PR Comment
-        run: |
-          echo "$dependency_updates" | gh pr comment ${{ github.event.pull_request.comments_url }} --body -
-        env:
-          GH_TOKEN: ${{ secrets.PR_CHECK }}
+  
