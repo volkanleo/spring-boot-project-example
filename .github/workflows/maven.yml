@@ -45,7 +45,7 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.PR_CHECK }}"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "${{ github.event.pull_request.comments_url }}" \
-            -d '{"body":"Me too"}'
+            -d '{"body":"$dependency_updates"}'
       
 
 
