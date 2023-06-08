@@ -1,0 +1,50 @@
+name: Maven Dependency Updates
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  check-dependency-updates:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+    
+      - name: Check Dependency Updates
+        id: dependency_updates
+        run: |
+          dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+            | grep '\->' \
+            | awk -F ' ' '{if ($2 != $4) print $0}')
+
+          if [ -z "$dependency_updates" ]; then
+            echo "::set-output name=message::✅ Congratulations, all your dependency have the latest releases! 🥳"
+          else
+
+            dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
+            echo "::set-output name=message::❌ **The following dependencies or microservices have updates available:** $dependency_updates"
+            echo $dependency_updates
+          fi
+
+      - name: Post Comment on PR
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.PR_CHECK }}
+          script: |
+            const message = {
+              body: "${{ steps.dependency_updates.outputs.message }}"
+            };
+
+            const request = {
+              method: 'POST',
+              url: "${{ github.event.pull_request.comments_url }}",
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'token ${{ secrets.PR_CHECK }}'
+              },
+              body: JSON.stringify(message)
+            };
+
+            await github.request(request);
