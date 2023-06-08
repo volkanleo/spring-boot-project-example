@@ -19,20 +19,16 @@ jobs:
             | grep '\->' \
             | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
 
-      - name: Extract dependency updates
-        id: extract-updates
-        run: |
-          echo "::set-output name=updates::$(grep -c ' -> ' dependency-updates.txt)"
-
       - name: Comment on pull request
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
             const fs = require('fs');
-            const updates = parseInt(fs.readFileSync('dependency-updates.txt', 'utf8').trim());
+            const updates = fs.readFileSync('dependency-updates.txt', 'utf8').trim();
+            echo $updates
             const { owner, repo, number } = context.issue;
-            const commentBody = updates > 0
+            const commentBody = updates !== ''
               ? `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`
               : '✅ Congratulations, all your dependencies have the latest releases! 🥳';
             github.pulls.createReview({
