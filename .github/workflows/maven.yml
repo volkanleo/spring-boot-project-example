@@ -45,19 +45,19 @@ jobs:
             -H "Authorization: token ${{ secrets.PR_CHECK }}" \
             -d "{\"body\": \"$message\"}"
             
-      - uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: (await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                commit_sha: context.sha,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-              })).data[0].number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '👋 Thanks for reporting!'
-            })            
-                  
+          - uses: actions/github-script@v6
+            with:
+              script: |
+                github.rest.issues.createComment({
+                  issue_number: (await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                    commit_sha: context.sha,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                  })).data[0].number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: '👋 Thanks for reporting!'
+                })            
+
 
 
