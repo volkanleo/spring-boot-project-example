@@ -1,53 +1,17 @@
-name: Maven Dependency Updates
+name: Check Dependencies
 
 on:
   pull_request:
     types: [opened]
-
 jobs:
-  check-dependency-updates:
+  dependency_check:
     runs-on: ubuntu-latest
-    
+    name: Check dependencies and add a comment in the PR with the result
     steps:
-      - name: Checkout repository
+      - name: Checkout project sources
         uses: actions/checkout@v2
-    
-      - name: Check Dependency Updates
-        id: dependency_updates
-        run: |
-          dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
-            | grep '\->' \
-            | awk -F ' ' '{if ($2 != $4) print $0}')
-
-          if [ -z "$dependency_updates" ]; then
-            echo "::set-output name=message::✅ Congratulations, all your dependency have the latest releases! 🥳"
-          else
-
-            dependency_updates=$(echo "$dependency_updates" | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
-            echo "::set-output name=comment-body::$dependency_updates"
-
-            echo $dependency_updates
-          fi
-            
-
-      - name: Set dependency updates
-        id: volkan
-        run: |
-          echo "::set-output name=messages::$dependency_updates"
-
-      - name: Comment on PR with JSON
-        uses: actions/github-script@v4
+      - name: Check Dependencies
+        uses: volkanleo/check-dependencies-in-pr-action@1.0.1
         with:
-          github-token: ${{ secrets.PR_CHECK }}
-          script: |
-            const body = JSON.stringify({
-              message: ${{ steps.volkan.outputs.messages }}
-            });
-            github.pulls.createReview({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
-              body: body
-            });
-
-
+          pull_request_url: ${{ github.event.pull_request.comments_url }}
+          github_token: ${{ secrets.PR_CHECK }}
