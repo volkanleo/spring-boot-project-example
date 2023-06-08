@@ -40,4 +40,12 @@ jobs:
               pull_number: number,
               body: commentBody
             });
-          
+          else: |
+            const commentBody = '✅ Congratulations, all your dependency have the latest releases! 🥳 ';
+            const { owner, repo, number } = context.issue;
+            github.pulls.createReview({
+              owner: owner,
+              repo: repo,
+              pull_number: number,
+              body: commentBody
+            });
