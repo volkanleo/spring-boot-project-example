@@ -30,7 +30,7 @@ jobs:
           fi
           
       - name: Set dependency updates
-        run: echo "::set-env name=dependency_updates::$dependency_updates"
+        run: echo "::set-output name=dependency_updates::$dependency_updates"
 
       - name: Comment on PR with JSON
         uses: actions/github-script@v4
