@@ -1,4 +1,4 @@
-name: Maven Dependency Updates
+name: Maven Dependency Updates 2
 
 on:
   pull_request:
