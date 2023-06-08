@@ -25,7 +25,7 @@ jobs:
           echo "::set-output name=updates::$(grep -c " -> " dependency-updates.txt)"
 
       - name: Comment on pull request (if updates found)
-        if: ${{ steps.extract-updates.outputs.updates | int > 0 }}
+        if: ${{ fromJSON(steps.extract-updates.outputs.updates).length > 0}}
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
