@@ -1,4 +1,4 @@
-name: Check Dependencies
+name: Check Dependencies with marketplace plugin
 
 on:
   pull_request:
