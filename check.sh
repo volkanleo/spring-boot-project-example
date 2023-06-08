@@ -11,7 +11,14 @@ else
   message="❌ **You have $countOutdated plugins with newer available releases:**\n$dependency_updates"
 fi
 
-echo "Release successfully finished."
-echo $message
-
-
+curl \
+  -X POST \
+  "${{ github.event.pull_request.comments_url }}" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: token ${{ secrets.PR_CHECK }}" \
+  -d \
+  "
+  {
+        \"body\": \"$message\"
+  }
+  "
