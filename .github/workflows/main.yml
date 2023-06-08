@@ -1,4 +1,4 @@
-name: Dependency Check
+name: VOLKAN
 
 on:
   pull_request:
@@ -15,11 +15,14 @@ jobs:
         uses: actions/checkout@v2
         
       - name: Check for dependency updates
-        id: extract
         run: |
           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
             | awk -F ' ' '$2 != $4 { print $0 }' > dependency-updates.txt
+            
+      - name: Extract dependency updates
+        id: extract
+        run: |
           has_updates=$(grep -c "\->" dependency-updates.txt)
           echo "::set-output name=dependency-updates::${has_updates}"
           echo "has_updates: $has_updates"
