@@ -5,21 +5,21 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.0</version> 
+        <version>2.6.2</version>
         <relativePath/> <!-- lookup parent from repository -->
-    </parent> 
+    </parent>
     <groupId>volkanozturk.examples</groupId>
     <artifactId>spring-boot-project-example</artifactId>
-    <version>1.0.0</version> 
+    <version>1.0.0</version>
     <name>spring-boot-project-example</name>
     <description>Spring Boot Project Example by Volkan Ozturk</description>
     <properties>
         <java.version>17</java.version>
-        <dependency.mapstruct.version>1.5.5.Final</dependency.mapstruct.version>
+        <dependency.mapstruct.version>1.4.1.Final</dependency.mapstruct.version>
         <dependency.org.apache.commons>3.12.0</dependency.org.apache.commons>
-        <dependency.org.apache.commons.collections>4.4</dependency.org.apache.commons.collections>
-        <dependency.springdoc.openapi.version>1.7.0</dependency.springdoc.openapi.version>
-        <dependency.maven.javadoc.plugin>3.5.0</dependency.maven.javadoc.plugin>
+        <dependency.org.apache.commons.collections>4.1</dependency.org.apache.commons.collections>
+        <dependency.springdoc.openapi.version>1.6.4</dependency.springdoc.openapi.version>
+        <dependency.maven.javadoc.plugin>3.0.0</dependency.maven.javadoc.plugin>
     </properties>
     <dependencies>
         <dependency>
