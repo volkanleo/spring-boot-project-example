@@ -1,4 +1,4 @@
-name: Dependency Update Checker
+name: TEST_VOLKAN
 
 on:
   pull_request:
