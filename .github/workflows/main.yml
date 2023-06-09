@@ -19,6 +19,9 @@ jobs:
           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
             | awk -F ' ' '$2 != $4 { print $0 }' > dependency-updates.txt
+            
+          commentBody=$(cat dependency-updates.txt)
+          echo "VOLKANN : " $commentBody
       
       - name: Check if dependency-updates.txt is empty
         id: check_empty_file
