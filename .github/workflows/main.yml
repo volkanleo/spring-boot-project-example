@@ -19,6 +19,16 @@ jobs:
             | grep '\->' \
             | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
 
+      - name: Read dependency updates
+        id: read-updates
+        run: |
+          echo "::set-output name=updates::$(cat dependency-updates.txt)"
+
+      - name: Count dependency updates
+        id: count-updates
+        run: |
+          echo "::set-output name=num-updates::$(grep -c ' -> ' dependency-updates.txt)"
+
       - name: Comment on pull request
         uses: actions/github-script@v4
         with:
@@ -27,7 +37,7 @@ jobs:
             const fs = require('fs');
             const { owner, repo, number } = context.issue;
             const updates = fs.readFileSync('dependency-updates.txt', 'utf8');
-            const numUpdates = updates.trim().split('\n').length;
+            const numUpdates = parseInt(steps.count-updates.outputs['num-updates']);
             let commentBody;
             if (numUpdates > 0) {
               commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
