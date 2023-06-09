@@ -16,22 +16,23 @@ jobs:
         
       - name: Check for dependency updates
         run: |
-          dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
-            | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt)
-          has_updates=$(cat dependency-updates.txt | grep -c "\->")
-          echo "::set-output name=has-updates::${has_updates}"
-          echo "::set-output name=dependency-updates::${dependency_updates}"
+            | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
+
+      - name: Extract dependency updates
+        id: extract-updates
+        run: |
           echo "::set-output name=updates::$(grep -c " -> " dependency-updates.txt)"
-          
+
       - name: Comment on pull request (if updates found)
-        if: ${{ steps.check-dependencies.outputs.has-updates == '1'  }}
+        if: ${{ steps.extract-updates.outputs.updates > 0 }}
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
             const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
-            const commentBody = `❌ WARNING: The following dependencies or microservices have updates availabledfgdfgdfg \n\n${updates}`;
+            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available::\n\n${updates}`;
             const { owner, repo, number } = context.issue;
             github.pulls.createReview({
               owner: owner,
