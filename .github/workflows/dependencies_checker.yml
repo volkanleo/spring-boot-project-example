@@ -23,6 +23,9 @@ jobs:
           echo "::set-output name=has-updates::${has_updates}"
           echo "::set-output name=dependency-updates::${dependency_updates}"
           echo "::set-output name=updates::$(grep -c " -> " dependency-updates.txt)"
+          echo "updates: $updates"
+          echo "has-updates: $has-updates"
+          echo "dependency-updates: $dependency-updates"
 
           
 
