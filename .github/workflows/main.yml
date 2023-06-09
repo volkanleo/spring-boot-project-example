@@ -42,11 +42,12 @@ jobs:
             if (updates.trim() !== '') {
               const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
               const { owner, repo, number } = context.issue;
-              github.pulls.createReview({
+              github.issues.createComment({
                 owner: owner,
                 repo: repo,
-                pull_number: number,
+                issue_number: number,
                 body: commentBody
               });
             }
+
 
