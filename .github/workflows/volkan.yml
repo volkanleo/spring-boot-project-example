@@ -25,13 +25,33 @@ jobs:
         run: |
           echo "::set-output name=updates::$(grep -c ' -> ' dependency-updates.txt)"
 
-      - name: Comment on pull request
+      - name: Comment on pull request (if updates found)
         if: ${{ steps.extract-updates.outputs.updates > 0 }}
-        run: |
-          echo "❌ WARNING: The following dependencies or microservices have updates available:"
-          cat dependency-updates.txt
-
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.PR_CHECK }}
+          script: |
+            const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
+            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
+            const { owner, repo, number } = context.issue;
+            github.issues.createComment({
+              owner: owner,
+              repo: repo,
+              issue_number: number,
+              body: commentBody
+            });
+      
       - name: Comment on pull request (no updates found)
         if: ${{ steps.extract-updates.outputs.updates == 0 }}
-        run: |
-          echo "✅ No dependency updates found."
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.PR_CHECK }}
+          script: |
+            const commentBody = `✅ No dependency updates found.`;
+            const { owner, repo, number } = context.issue;
+            github.issues.createComment({
+              owner: owner,
+              repo: repo,
+              issue_number: number,
+              body: commentBody
+            });
