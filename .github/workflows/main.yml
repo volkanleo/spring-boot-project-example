@@ -24,10 +24,12 @@ jobs:
         id: extract
         run: |
           has_updates=$(grep -c "\->" dependency-updates.txt)
-          echo "::set-output name=dependency-updates::$has_updates"
+          echo "::set-output name=updatess::$has_updates"
+          echo "has-updates: $has-updates"
+          echo "updatess: $updatess"
 
       - name: Comment on pull request (if updates found)
-        if: ${{ steps.extract.outputs.dependency-updates != '0' }}
+        if: ${{ steps.extract.outputs.updatess != '0' }}
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
