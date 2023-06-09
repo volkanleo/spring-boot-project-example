@@ -32,7 +32,7 @@ jobs:
           fi
 
       - name: Comment on pull request (if updates found)
-        if: env.has_updates == 'true' && contains(github.event_name, 'pull_request')
+        if: env.has_updates == true && contains(github.event_name, 'pull_request')
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
