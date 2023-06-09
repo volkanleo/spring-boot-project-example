@@ -19,18 +19,18 @@ jobs:
           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
             | awk -F ' ' '$2 != $4 { print $0 }' > dependency-updates.txt
-
-      - name: Extract dependency updates
-        id: extract
+      
+      - name: Check if dependency-updates.txt is empty
+        id: check_empty_file
         run: |
-          has_updates=$(grep -c "\->" dependency-updates.txt)
-          echo "::set-output name=updatess::$has_updates"
-          echo "has-updates: $has-updates"
-          echo "updatess: $updatess"
+          if [ ! -s dependency-updates.txt ]; then
+            echo "Dependency updates file is empty, skipping further steps."
+            touch skip-run
+          fi
 
       - name: Comment on pull request (if updates found)
-        if: ${{ steps.extract.outputs.updatess != '0' }}
         uses: actions/github-script@v4
+        if: steps.check_empty_file.outputs.skip-run != 'true'
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
