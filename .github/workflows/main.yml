@@ -21,33 +21,20 @@ jobs:
             | awk -F ' ' '$2 != $4 { print $0 }' > dependency-updates.txt
         
         
-        
-      - name: Check if dependency-updates.txt is empty
-        id: check_updates
-        run: echo "::set-output name=isEmpty::$(test -s dependency-updates.txt || echo true)"
-
-      - name: Perform updates if not empty
-        if: steps.check_updates.outputs.isEmpty != 'true'
+      - name: Check if dependency updates file is empty
+        id: check-updates
         run: |
-          # Your update commands here
-          echo "Performing dependency updates"
-
-      - name: Notify if empty
-        if: steps.check_updates.outputs.isEmpty == 'true'
-        run: echo "No dependency updates found"
-        
-        
-      - name: Check if dependency-updates.txt is empty
-        id: check_empty_file
-        run: |
-          if [ ! -s dependency-updates.txt ]; then
-            echo "Dependency updates file is empty, skipping further steps."
-            touch skip-run
+          if [[ -s "dependency-updates.txt" ]]; then
+            echo "::set-output name=has_updates::true"
+          else
+            echo "::set-output name=has_updates::false"
           fi
+          echo "has_updates: $has_updates"
+          
 
       - name: Comment on pull request (if updates found)
         uses: actions/github-script@v4
-        if: steps.check_empty_file.outputs.skip-run != 'true'
+        if: steps.check-updates.outputs.has_updates == 'true'
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
