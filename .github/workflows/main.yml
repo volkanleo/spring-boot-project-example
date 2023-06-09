@@ -1,4 +1,4 @@
-name: VOLKAN
+name: Dependency Update Checker
 
 on:
   pull_request:
@@ -13,29 +13,28 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        
+
       - name: Check for dependency updates
         run: |
           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
             | awk -F ' ' '$2 != $4 { print $0 }' > dependency-updates.txt
-            
+
       - name: Extract dependency updates
         id: extract
         run: |
           has_updates=$(grep -c "\->" dependency-updates.txt)
-          echo "::set-output name=dependency-updates::${has_updates}"
-          echo "has_updates : $has_updates"
-          echo "has_updates 2 : ${has_updates##*( )}"
-          
+          echo "::set-output name=dependency-updates::$has_updates"
+
       - name: Comment on pull request (if updates found)
-        if: ${has_updates != '0'}
+        if: ${{ steps.extract.outputs.dependency-updates != '0' }}
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
-            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available::\n\n${updates}`;
+            const fs = require('fs');
+            const updates = fs.readFileSync('dependency-updates.txt', 'utf8');
+            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
             const { owner, repo, number } = context.issue;
             github.pulls.createReview({
               owner: owner,
