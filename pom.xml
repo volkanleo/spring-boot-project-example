@@ -13,7 +13,7 @@
     <version>1.0.0</version>
     <name>spring-boot-project-example</name>
     <description>Spring Boot Project Example by Volkan Ozturk</description>
-    <properties>
+    <properties> 
         <java.version>17</java.version>
         <dependency.mapstruct.version>1.5.5.Final</dependency.mapstruct.version>
         <dependency.org.apache.commons>3.12.0</dependency.org.apache.commons>
