@@ -1,0 +1,60 @@
+name: last
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  check-dependencies:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check for dependency updates
+        run: |
+          mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+            | grep '\->' \
+            | awk -F ' ' '$2 != $4 { print $0 }' > dependency-updates.txt
+          exit_code=$?
+          if [ $exit_code -ne 0 ]; then
+            echo "Maven build failed with exit code $exit_code"
+            exit $exit_code
+          fi
+
+      - name: Extract dependency updates
+        id: extract
+        run: |
+          if [ -f dependency-updates.txt ]; then
+            has_updates=$(grep -c "\->" dependency-updates.txt)
+          else
+            has_updates=0
+          fi
+          echo "::set-output name=dependency-updates::$has_updates"
+
+      - name: Comment on pull request (if updates found)
+        if: ${{ steps.extract.outputs.dependency-updates != '0' }}
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.PR_CHECK }}
+          script: |
+            const fs = require('fs');
+            let updates = "";
+            try {
+              updates = fs.readFileSync('dependency-updates.txt', 'utf8');
+            } catch (error) {
+              console.error("Error reading dependency-updates.txt:", error);
+            }
+            if (updates.length > 0) {
+              const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
+              const { owner, repo, number } = context.issue;
+              github.pulls.createReview({
+                owner: owner,
+                repo: repo,
+                pull_number: number,
+                body: commentBody
+              });
+            }
