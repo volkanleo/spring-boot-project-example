@@ -15,9 +15,9 @@
     <description>Spring Boot Project Example by Volkan Ozturk</description>
     <properties>
         <java.version>17</java.version>
-        <dependency.mapstruct.version>1.5.5.Final</dependency.mapstruct.version>
+        <dependency.mapstruct.version>1.5.1.Final</dependency.mapstruct.version>
         <dependency.org.apache.commons>3.12.0</dependency.org.apache.commons>
-        <dependency.org.apache.commons.collections>4.4</dependency.org.apache.commons.collections>
+        <dependency.org.apache.commons.collections>4.1</dependency.org.apache.commons.collections>
         <dependency.springdoc.openapi.version>1.7.0</dependency.springdoc.openapi.version>
         <dependency.maven.javadoc.plugin>3.5.0</dependency.maven.javadoc.plugin>
     </properties>
