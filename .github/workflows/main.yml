@@ -1,53 +1,17 @@
-name: TEST_VOLKAN
+name: Check Maven Dependencies
 
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
-
+    types: [opened]
 jobs:
-  check-dependencies:
+  dependency_check:
     runs-on: ubuntu-latest
-
+    name: Check dependencies and add a comment in the PR with the result
     steps:
-      - name: Checkout repository
+      - name: Checkout project sources
         uses: actions/checkout@v2
-
-      - name: Check for dependency updates
-        run: |
-          mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
-            | grep '\->' \
-            | awk -F ' ' '$2 != $4 { print $0 }' > dependency-updates.txt
-
-      - name: Check if dependency updates file is empty
-        id: check-updates
-        run: |
-          if [ -s "dependency-updates.txt" ]; then
-            echo "::set-output name=has_updates::true"
-            echo "has_updates=true" >> $GITHUB_ENV
-          else
-            echo "::set-output name=has_updates::false"
-            echo "has_updates=false" >> $GITHUB_ENV
-          fi
-          
-
-      - name: Comment on pull request (if updates found)
-        uses: actions/github-script@v4
+      - name: Check Dependencies
+        uses: volkanleo/check-dependencies-in-pr-action@1.0.2
         with:
-          github-token: ${{ secrets.PR_CHECK }}
-          script: |
-            const fs = require('fs');
-            const updates = fs.readFileSync('dependency-updates.txt', 'utf8');
-            if (updates.trim() !== '') {
-              const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
-              const { owner, repo, number } = context.issue;
-              github.issues.createComment({
-                owner: owner,
-                repo: repo,
-                issue_number: number,
-                body: commentBody
-              });
-            }
-
-
+          pull_request_url: ${{ github.event.pull_request.comments_url }}
+          github_token: ${{ secrets.PR_CHECK }}
