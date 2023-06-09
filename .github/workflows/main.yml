@@ -30,9 +30,9 @@ jobs:
             echo "::set-output name=has_updates::false"
             echo "has_updates=false" >> $GITHUB_ENV
           fi
+          
 
       - name: Comment on pull request (if updates found)
-        if: env.has_updates == true && contains(github.event_name, 'pull_request')
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
