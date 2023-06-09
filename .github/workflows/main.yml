@@ -1,10 +1,11 @@
+
 name: Check Dependencies Version
 
 on:
   pull_request:
     types:
       - opened
-
+      
 jobs:
   check-dependencies:
     runs-on: ubuntu-latest
@@ -12,38 +13,42 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
+        
       - name: Check for dependency updates
         run: |
-          mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
             | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
 
-      - name: Read dependency updates
-        id: read-updates
+      - name: Extract dependency updates
+        id: extract-updates
         run: |
-          echo "::set-output name=updates::$(cat dependency-updates.txt)"
+          echo "::set-output name=updates::$(grep -c ' -> ' dependency-updates.txt)"
 
-      - name: Count dependency updates
-        id: count-updates
-        run: |
-          echo "::set-output name=num-updates::$(grep -c ' -> ' dependency-updates.txt)"
-
-      - name: Comment on pull request
+      - name: Comment on pull request (if updates found)
+        if: ${{ steps.extract-updates.outputs.updates > 0 }}
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
-            const fs = require('fs');
+            const updates = require('fs').readFileSync('dependency-updates.txt', 'utf8');
+            const commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
             const { owner, repo, number } = context.issue;
-            const updates = fs.readFileSync('dependency-updates.txt', 'utf8');
-            const numUpdates = parseInt(steps.count-updates.outputs['num-updates']);
-            let commentBody;
-            if (numUpdates > 0) {
-              commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
-            } else {
-              commentBody = `✅ Congratulations, all your dependencies have the latest releases! 🥳`;
-            }
+            github.issues.createComment({
+              owner: owner,
+              repo: repo,
+              issue_number: number,
+              body: commentBody
+            });
+      
+      - name: Comment on pull request (no updates found)
+        if: ${{ steps.extract-updates.outputs.updates == 0 }}
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.PR_CHECK }}
+          script: |
+            const commentBody = `✅ Congratulations, all your dependency have the latest releases! 🥳 `;
+            const { owner, repo, number } = context.issue;
             github.issues.createComment({
               owner: owner,
               repo: repo,
