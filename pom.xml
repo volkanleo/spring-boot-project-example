@@ -50,12 +50,6 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- javax validation dependency -->
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-        </dependency>
-
         <!-- mongodb dependency -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
