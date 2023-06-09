@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.2</version>
+        <version>3.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>volkanozturk.examples</groupId>
@@ -15,7 +15,7 @@
     <description>Spring Boot Project Example by Volkan Ozturk</description>
     <properties>
         <java.version>17</java.version>
-        <dependency.mapstruct.version>1.5.5.Final</dependency.mapstruct.version>
+        <dependency.mapstruct.version>1.5.4.Final</dependency.mapstruct.version>
         <dependency.org.apache.commons>3.12.0</dependency.org.apache.commons>
         <dependency.org.apache.commons.collections>4.4</dependency.org.apache.commons.collections>
         <dependency.springdoc.openapi.version>1.7.0</dependency.springdoc.openapi.version>
