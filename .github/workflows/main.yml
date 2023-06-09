@@ -19,18 +19,7 @@ jobs:
           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
             | awk -F ' ' '$2 != $4 { print $0 }' > dependency-updates.txt
-           
-           
-      - name: Extract dependency updates
-        id: extract
-        run: |
-          has_updates=$(grep -c "\->" dependency-updates.txt)
-          echo "::set-output name=updatess::$has_updates"
-          echo "has-updates: $has-updates"
-          echo "updatess: $updatess"
-          commentBody=$(cat dependency-updates.txt)
-          echo "VOLKANN: $commentBody"
-      
+             
       - name: Check if dependency-updates.txt is empty
         id: check_empty_file
         run: |
