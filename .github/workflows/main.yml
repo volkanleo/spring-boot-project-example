@@ -15,21 +15,22 @@ jobs:
         uses: actions/checkout@v2
         
       - name: Check for dependency updates
-        run: |  
+        run: |
           mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
-              | grep '\->' \
-              | awk -F ' ' '$2 != $4 { print $0 }' > dependency-updates.txt            
+            | grep '\->' \
+            | awk -F ' ' '$2 != $4 { print $0 }' > dependency-updates.txt
             
       - name: Extract dependency updates
         id: extract
         run: |
           has_updates=$(grep -c "\->" dependency-updates.txt)
-          echo "::set-output name=volkan::$has_updates"
+          echo "::set-output name=dependency-updates::${has_updates}"
           echo "has_updates: $has_updates"
-          echo "volkan: $volkan"
+          echo "dependency-updates: $dependency-updates"
+          echo "dependency-updates: $dependency-updates"
           
       - name: Comment on pull request (if updates found)
-        if: ${{ steps.extract.outputs.volkan != '0' }}
+        if: ${{ steps.extract.outputs.dependency-updates != '0' }}
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
