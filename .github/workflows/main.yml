@@ -33,9 +33,12 @@ jobs:
 
       - name: Print GitHub environment variables
         run: |
-          echo "GitHub environment variables:"
-          cat $GITHUB_ENV
-          
+          if [ -f "$GITHUB_ENV" ]; then
+            echo "GitHub environment variables:"
+            cat $GITHUB_ENV
+          else
+            echo "GitHub environment variables not found."
+          fi
 
       - name: Comment on pull request (if updates found)
         uses: actions/github-script@v4
