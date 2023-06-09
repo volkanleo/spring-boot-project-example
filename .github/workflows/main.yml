@@ -31,16 +31,9 @@ jobs:
             echo "has_updates=false" >> $GITHUB_ENV
           fi
 
-      - name: Print GitHub environment variables
-        run: |
-          if [ -f "$GITHUB_ENV" ]; then
-            echo "GitHub environment variables:"
-            cat $GITHUB_ENV
-          else
-            echo "GitHub environment variables not found."
-          fi
 
       - name: Comment on pull request (if updates found)
+        if: env.has_updates == 'true'
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
