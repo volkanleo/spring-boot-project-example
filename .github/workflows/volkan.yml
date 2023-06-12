@@ -1,0 +1,40 @@
+name: volkan
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  check-dependencies:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check for dependency updates
+        id: extract-updates
+        run: |
+          updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false -q | grep '->' | cut -d ' ' -f 2,4)
+          echo "::set-output name=updates::$updates"
+
+      - name: Comment on pull request
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.PR_CHECK }}
+          script: |
+            const updates = process.env.updates;
+            const { owner, repo, number } = context.issue;
+            let commentBody;
+            if (updates) {
+              commentBody = `❌ WARNING: The following dependencies or microservices have updates available:\n\n${updates}`;
+            } else {
+              commentBody = `✅ Congratulations, all your dependencies have the latest releases! 🥳`;
+            }
+            github.issues.createComment({
+              owner: owner,
+              repo: repo,
+              issue_number: number,
+              body: commentBody
+            });
