@@ -1,0 +1,1 @@
+echo "Please update the dependencies and microservice versions before committing..."
