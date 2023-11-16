@@ -27,7 +27,7 @@ jobs:
         if: ${{ env.updates != 0 }}
         uses: actions/github-script@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PR_CHECK }}
           script: |
             const fs = require('fs');
             const updates = fs.readFileSync('dependency-updates.txt', 'utf8');
