@@ -1,17 +1,43 @@
-name: Check Dependencies
+name: Check Dependencies Version
 
 on:
   pull_request:
     types: [opened]
+
 jobs:
-  dependency_check:
+  check-dependencies:
     runs-on: ubuntu-latest
-    name: Check dependencies and add a comment in the PR with the result
+
     steps:
-      - name: Checkout project sources
-        uses: actions/checkout@v2
-      - name: Check Dependencies
-        uses: volkanleo/check-dependencies-in-pr-action@1.0.4
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Check for Dependency Updates
+        run: |
+          mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+            | grep '\->' \
+            | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
+
+      - name: Set Updates Flag
+        id: set-updates-flag
+        run: |
+          echo "updates=$(grep -c ' -> ' dependency-updates.txt)" >> $GITHUB_ENV
+
+      - name: Post Comment on Pull Request
+        if: ${{ env.updates != 0 }}
+        uses: actions/github-script@v4
         with:
-          pull_request_url: ${{ github.event.pull_request.comments_url }}
-          github_token: ${{ secrets.PR_CHECK }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const updates = fs.readFileSync('dependency-updates.txt', 'utf8');
+            const commentBody = updates ? 
+              `❌ WARNING: The following dependencies have updates available:\n\n${updates}` :
+              '✅ Congratulations, all dependencies are up-to-date! 🥳';
+            const { owner, repo, number } = context.issue;
+            github.issues.createComment({
+              owner,
+              repo,
+              issue_number: number,
+              body: commentBody
+            });
