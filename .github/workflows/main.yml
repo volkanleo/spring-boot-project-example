@@ -17,7 +17,8 @@ jobs:
           dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
             | awk -F ' ' '{if ($2 != $4) print $0}')
-          filtered_updates=$(echo "$dependency_updates" | grep -i -vE '[0-9]+\.[0-9]+\.[0-9]+-?[ba]eta-?[0-9]*')
+          # Broaden the filter to include more patterns like Beta1, alpha-2, etc.
+          filtered_updates=$(echo "$dependency_updates" | grep -i -vE 'beta|alpha')
           echo "$filtered_updates" > dependency-updates.txt
           echo "countOutdated=$(echo "$filtered_updates" | grep -c ' -> ')" >> $GITHUB_ENV
 
