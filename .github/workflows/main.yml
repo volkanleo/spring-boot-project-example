@@ -14,25 +14,24 @@ jobs:
 
       - name: Check for Dependency Updates
         run: |
-          mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
+          dependency_updates=$(mvn versions:display-property-updates versions:display-parent-updates -DgenerateBackupPoms=false \
             | grep '\->' \
-            | awk -F ' ' '{if ($2 != $4) print $0}' > dependency-updates.txt
-
-      - name: Set Updates Flag
-        id: set-updates-flag
-        run: |
-          echo "updates=$(grep -c ' -> ' dependency-updates.txt)" >> $GITHUB_ENV
+            | awk -F ' ' '{if ($2 != $4) print $0}')
+          filtered_updates=$(echo "$dependency_updates" | grep -i -vE '[0-9]+\.[0-9]+\.[0-9]+-?[ba]eta-?[0-9]*')
+          echo "$filtered_updates" > dependency-updates.txt
+          echo "countOutdated=$(echo "$filtered_updates" | grep -c ' -> ')" >> $GITHUB_ENV
 
       - name: Post Comment on Pull Request
-        if: ${{ env.updates != 0 }}
+        if: ${{ env.countOutdated != 0 }}
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.PR_CHECK }}
           script: |
             const fs = require('fs');
             const updates = fs.readFileSync('dependency-updates.txt', 'utf8');
-            const commentBody = updates ? 
-              `❌ WARNING: The following dependencies have updates available:\n\n${updates}` :
+            const countOutdated = process.env.countOutdated;
+            const commentBody = countOutdated > 0 ? 
+              `❌ WARNING: There are ${countOutdated} dependencies with updates available:\n\n${updates}` :
               '✅ Congratulations, all dependencies are up-to-date! 🥳';
             const { owner, repo, number } = context.issue;
             github.issues.createComment({
